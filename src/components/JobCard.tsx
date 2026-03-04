@@ -1,5 +1,5 @@
 import { Mail, Phone, ExternalLink, MapPin, Clock, IndianRupee } from "lucide-react";
-import type { JobPosting } from "@/data/mockJobs";
+import type { JobPosting } from "@/types/job";
 
 const logoColors: Record<string, string> = {
   G: "bg-primary",
@@ -24,9 +24,8 @@ export default function JobCard({ job, isSelected, onClick, compact }: JobCardPr
     return (
       <div
         onClick={onClick}
-        className={`glass rounded-lg p-3 cursor-pointer transition-all duration-300 card-3d ${
-          isSelected ? "ring-2 ring-primary shadow-[var(--shadow-glow)]" : "hover:ring-1 hover:ring-primary/50"
-        }`}
+        className={`glass rounded-lg p-3 cursor-pointer transition-all duration-300 card-3d ${isSelected ? "ring-2 ring-primary shadow-[var(--shadow-glow)]" : "hover:ring-1 hover:ring-primary/50"
+          }`}
       >
         <div className="flex items-center gap-3">
           <div className={`w-9 h-9 rounded-md ${logoColors[job.companyLogo] || "bg-muted"} flex items-center justify-center text-primary-foreground font-display font-bold text-sm`}>
@@ -67,13 +66,15 @@ export default function JobCard({ job, isSelected, onClick, compact }: JobCardPr
 
       {/* Role */}
       <h3 className="font-display font-bold text-foreground mb-1 text-base">{job.role}</h3>
-      
+
       {/* Location */}
       <p className="text-xs text-muted-foreground flex items-center gap-1 mb-2">
         <MapPin className="w-3 h-3 text-pink" />
         {job.location}
-        {job.distance !== undefined && (
+        {job.distance !== undefined ? (
           <span className="text-primary ml-1">({job.distance.toFixed(0)} km away)</span>
+        ) : (
+          <span className="text-amber ml-1 italic">(Remote / Unmapped)</span>
         )}
       </p>
 

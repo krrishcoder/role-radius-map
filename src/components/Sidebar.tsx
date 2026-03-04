@@ -1,5 +1,5 @@
 import { Search, SlidersHorizontal } from "lucide-react";
-import type { JobPosting } from "@/data/mockJobs";
+import type { JobPosting } from "@/types/job";
 import JobCard from "./JobCard";
 
 interface SidebarProps {
@@ -35,11 +35,10 @@ export default function Sidebar({ jobs, selectedId, filter, onFilterChange, onSe
             <button
               key={f.id}
               onClick={() => onFilterChange(f.id)}
-              className={`px-3 py-1 rounded-full text-[11px] font-medium transition-all ${
-                filter === f.id
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-              }`}
+              className={`px-3 py-1 rounded-full text-[11px] font-medium transition-all ${filter === f.id
+                ? "bg-primary text-primary-foreground"
+                : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                }`}
             >
               {f.label}
             </button>
@@ -68,7 +67,7 @@ export default function Sidebar({ jobs, selectedId, filter, onFilterChange, onSe
       {/* Footer */}
       <div className="p-3 border-t border-border">
         <p className="text-[10px] text-muted-foreground text-center">
-          Data sourced from LinkedIn · Last 4 days · Mock data
+          Data sourced from LinkedIn · Last 4 days
         </p>
       </div>
     </div>

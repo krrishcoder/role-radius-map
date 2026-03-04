@@ -1,7 +1,8 @@
 import { useMemo, useState, useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { mockJobs, type JobPosting } from "@/data/mockJobs";
+import type { JobPosting } from "@/types/job";
+import { useJobs } from "@/hooks/useJobs";
 import { useUserLocation, getDistance } from "@/hooks/useUserLocation";
 import JobCard from "@/components/JobCard";
 import Sidebar from "@/components/Sidebar";
@@ -48,17 +49,23 @@ export default function MapView() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const markersRef = useRef<L.Marker[]>([]);
 
+  const { data: fetchedJobs = [], isLoading } = useJobs();
+
   const jobs = useMemo(() => {
-    let list = mockJobs.map((j) => ({
+    let list = fetchedJobs.map((j) => ({
       ...j,
       distance: userLoc ? getDistance(userLoc[0], userLoc[1], j.officeCoords[0], j.officeCoords[1]) : undefined,
     }));
     if (filter === "stipend") list = list.filter((j) => j.stipend);
     if (filter === "recent") list = list.filter((j) => j.daysAgo <= 2);
-    if (filter === "nearest") list = list.sort((a, b) => (a.distance ?? 9999) - (b.distance ?? 9999));
-    else list = list.sort((a, b) => a.daysAgo - b.daysAgo);
+
+    if (filter === "nearest") {
+      list = list.sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity));
+    } else {
+      list = list.sort((a, b) => a.daysAgo - b.daysAgo);
+    }
     return list;
-  }, [userLoc, filter]);
+  }, [userLoc, filter, fetchedJobs]);
 
   const selectedJob = jobs.find((j) => j.id === selectedId);
 
@@ -66,10 +73,18 @@ export default function MapView() {
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
 
+    const indiaBounds = L.latLngBounds(
+      L.latLng(6.0, 68.0), // South West
+      L.latLng(36.0, 98.0) // North East
+    );
+
     const map = L.map(mapContainerRef.current, {
       center: [20.5937, 78.9629],
       zoom: 5,
       zoomControl: false,
+      maxBounds: indiaBounds,
+      maxBoundsViscosity: 1.0,
+      minZoom: 4,
     });
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
@@ -162,8 +177,8 @@ export default function MapView() {
               <span className="font-display font-bold text-primary-foreground text-sm">AI</span>
             </div>
             <div>
-              <h1 className="font-display font-bold text-foreground text-sm">LinkedIn AI/ML Intern Tracker</h1>
-              <p className="text-[10px] text-muted-foreground">Last 4 days · {jobs.length} positions found</p>
+              <h1 className="font-display font-bold text-foreground text-sm">Job Market Tracker</h1>
+              <p className="text-[10px] text-muted-foreground">Showing latest {jobs.length} open positions</p>
             </div>
           </div>
         </div>
