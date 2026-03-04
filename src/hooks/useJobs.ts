@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabaseClient';
+import { supabase } from '@/integrations/supabase/client';
 import { JobPosting } from '@/types/job';
 import { geocodeLocation } from '@/lib/geocode';
 
@@ -8,12 +8,7 @@ export function useJobs() {
     return useQuery({
         queryKey: ['jobs_data'],
         queryFn: async (): Promise<JobPosting[]> => {
-            if (!supabase) {
-                console.warn('Supabase client not initialized.');
-                return [];
-            }
-
-            const { data, error } = await supabase
+            const { data, error } = await (supabase as any)
                 .from('jobs_data')
                 .select('*');
 
